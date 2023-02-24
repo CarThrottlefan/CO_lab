@@ -17,8 +17,18 @@
 
 .text
 # your strings here
-
-.global my_main                         # make my_main accessible globally
+    mystring: .asciz "Hello_world!\n"
 
 my_main:
 	# IMPLEMENT ME    
+
+    pushq %rbp
+    movq %rsp, %rbp
+    movq $0, %rax
+    leaq mystring(%rip), %rdi
+    call printf
+
+    movq %rbp, %rsp
+    popq %rbp
+    mov $0, %rdi
+    call exit
