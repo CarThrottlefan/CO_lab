@@ -17,7 +17,8 @@
 
 .text
 # your strings here
-    mystring: .asciz "Hello_world!\n"
+    mystring: .asciz "Assignment %d\n"
+.global my_main
 
 my_main:
 	# IMPLEMENT ME    
@@ -25,10 +26,13 @@ my_main:
     pushq %rbp
     movq %rsp, %rbp
     movq $0, %rax
+    movq $1, %rsi
     leaq mystring(%rip), %rdi
     call printf
 
     movq %rbp, %rsp
     popq %rbp
-    mov $0, %rdi
+
+    movq $0, %rdi
     call exit
+    
