@@ -18,14 +18,14 @@
 
 .text
 # your strings here
-mystring : .asciz "Assignment 2: inout"
+mystring : .asciz "Assignment 2: inout\n"
 formatstr : .asciz "%ld"
+outputStr : .asciz "%ld\n"
 
 .global my_main                         # make my_main accessible globally
 .global my_increment                    # make my_increment accessible globally
 
-.text
-# your strings here
+
    
 my_main:
         # set up the stack frame
@@ -62,8 +62,9 @@ inout:
         movq -8(%rbp), %rdi           # Call scanf
         call my_increment
 
-        movq %rax, %rdi
-        leaq formatstr(%rip), %rdi
+        movq %rax, %rsi
+        movq $0, %rax
+        leaq outputStr(%rip), %rdi
         call printf 
 
 
