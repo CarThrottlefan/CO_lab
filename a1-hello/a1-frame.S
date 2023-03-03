@@ -17,7 +17,7 @@
 
 .text
 # your strings here
-    mystring: .asciz "Assignment %d\n"
+    mystring: .asciz "Alexandru Florea, Rasa Karnite\n%d, %d\nAssignment %d\n"
 .global my_main
 
 my_main:
@@ -26,7 +26,9 @@ my_main:
     pushq %rbp
     movq %rsp, %rbp
     movq $0, %rax
-    movq $1, %rsi
+    movq $2772605, %rsi
+    movq $2766765, %rdx
+    movq $1, %rcx
     leaq mystring(%rip), %rdi
     call printf
 
