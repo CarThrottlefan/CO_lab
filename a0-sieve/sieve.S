@@ -72,5 +72,4 @@ lp2end:
 end:
 	mov     $0, %rdi            # load program exit code
 	call    exit                # exit the program
-	#aaaa
 
