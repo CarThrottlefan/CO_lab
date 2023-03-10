@@ -55,7 +55,7 @@ inout:
         pushq %rbp                    # Prologue : push the base pointer . for begging subroutine
         movq %rsp , %rbp              # and copy stack pointer to RBP.     for begging soubroutine
         subq $16 , %rsp               # reserve stack space 8bytes(could be 16) for variables
-        leaq -8(%rbp), %rsi           # Load address of stack vari n rsi
+        leaq -8(%rbp), %rsi           # Load address of stack var in rsi
         leaq formatstr(%rip), %rdi    # load first argument of scanf
         movq $0 , %rax                # no vector registers for scanf
         call scanf                      # Call scanf
