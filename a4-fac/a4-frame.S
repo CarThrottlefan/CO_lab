@@ -67,6 +67,7 @@ inout:
 
         movq %rbp, %rsp                 # at the end 
         popq %rbp                       # at the end
+        ret
 
 factorial: 
         # IMPLEMENT ME
@@ -74,21 +75,38 @@ factorial:
         pushq %rbp;
         movq %rsp, %rbp; 
                                 # rdi contains the value of n
-        cmpq $1, %rax           # compare RAX to 1  
-        jge ifcode   
+        cmpq $0, %rdi           # test if number is 0
+        je if
+        jmp else
 
-ifcode:            
+if:
+        movq $0, %rax;
+        
+        leaq outputStr(%rip), %rdi
+        call printf
+
+        movq %rbp, %rsp;
+        popq %rbp;
+        call exit    
+else:
+        cmpq $1, %rdi           # compare RAX to 1  
+        je ifCode               # compares if rax is equal to 1
+        jmp elseCode                # if you don't enter ifCode, jump to elseCode
+
+ifCode:            
         movq $1, %rax;
         movq %rbp, %rsp;
         popq %rbp;
         ret 
-end:
+elseCode:
 
         pushq %rdi;
         decq %rdi;
         call factorial
-        incq %rdi;
-        imul %rdi
+#        incq %rdi; no longer used
+#        imul %rdi no longer used
+        popq %rdi 
+        mulq %rdi
         # movq %rdi, %rax;
 
         movq %rbp, %rsp;
