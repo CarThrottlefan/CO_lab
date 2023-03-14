@@ -31,26 +31,26 @@ my_main:
     movq    %rsp, %rbp          # initialize the base pointer
 
     subq $16 , %rsp                # reserve stack space 8bytes(could be 16) for variables
-    leaq parameter1(%rip), %rdi         # Load address of stack var in rsi
-    leaq -8(%rbp), %rsi     # load first argument of scanf
+    leaq parameter1(%rip), %rdi    # Load address of stack var in rsi(%ld)
+    leaq -8(%rbp), %rsi            # load first argument of scanf
     movq $0 , %rax                 # no vector registers for scanf
-    call scanf                   # Call scanf
+    call scanf                     # Call scanf
 
 
     leaq -16(%rbp), %rsi           # Load address of stack var in rsi
-    leaq parameter2(%rip), %rdi     # load first argument of scanf rdi
+    leaq parameter2(%rip), %rdi    # load first argument of scanf rdi
 
     movq $0 , %rax                 # no vector registers for scanf
-    call scanf                # Call scanf
-    movq -8(%rbp), %rdi           # tell the computer that the number goes from 0 to -8
-    movq -16(%rbp), %rsi           # tell the computer that the number goes from 0 to -8
+    call scanf                     # Call scanf
+    movq -8(%rbp), %rdi            # move first parameter in rdi register
+    movq -16(%rbp), %rsi           # move second parameter in rsi regster
 
     call my_pow
 
     movq %rax, %rsi                 # moving the values of rax to rsi
-    movq $0 , %rax              # no vector registers in use for printf
-    leaq parameter3(%rip) , %rdi  # load address of a string is in rdi
-    call printf                 # Call the printf routine
+    movq $0 , %rax                  # no vector registers in use for printf
+    leaq parameter3(%rip) , %rdi    # load address of a string
+    call printf                     # Call the printf routine
 
     mov     $0, %rdi            # load program exit code
 	call    exit                # exit the program
@@ -60,25 +60,24 @@ my_pow:
 
  pushq %rbp                    # Prologue : push the base pointer . for begging subroutine
  movq %rsp , %rbp              # and copy stack pointer to RBP.     for begging soubroutine
- movq %rdi, %rax
+ movq %rdi, %rax                # move value in rdi to rax
 
- cmpq $0, %rsi
- jle case1
+ cmpq $0, %rsi                 # compare value in rsi(power) with 0
+ jle case1                     # if its less or equal it jumps to case 1
 
 case1:
- movq $1 ,%rax
- jle end
+ movq $1 ,%rax                  # 1 moved in rax
+ jle end                        # jump to end
 
 loop3:
-mulq %rdi
-decq %rsi
+mulq %rdi                          # multiply vule in rdi with value in rax
+decq %rsi                          # decrease rsi
 
-cmpq $1 , %rsi       # r e p e a t t h e l o o p
-jge loop3            # if rsi less or equal
-# movq %rdi, %rax                # moves rdi to the return register(rax)
+cmpq $1 , %rsi                  # compare rsi to 1
+jge loop3                       # if rsi grwater or equakl to 1 jump to loop3
 jmp end
 
 end:
-movq %rbp, %rsp
-popq %rbp
+movq %rbp, %rsp           # end
+popq %rbp                 # end
 ret
