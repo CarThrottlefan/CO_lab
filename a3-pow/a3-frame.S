@@ -38,7 +38,7 @@ my_main:
 
 
     leaq -16(%rbp), %rsi           # Load address of stack var in rsi
-    leaq parameter2(%rip), %rdi    # load first argument of scanf rdi
+    leaq parameter1(%rip), %rdi    # load first argument of scanf rdi
 
     movq $0 , %rax                 # no vector registers for scanf
     call scanf                     # Call scanf
@@ -49,7 +49,7 @@ my_main:
 
     movq %rax, %rsi                 # moving the values of rax to rsi
     movq $0 , %rax                  # no vector registers in use for printf
-    leaq parameter3(%rip) , %rdi    # load address of a string
+    leaq parameter1(%rip) , %rdi    # load address of a string
     call printf                     # Call the printf routine
 
     mov     $0, %rdi            # load program exit code
@@ -67,12 +67,14 @@ my_pow:
  jmp loop3
 
 loop3:
+cmpq $1, %rsi
+je end
+
 mulq %rdi                          # multiply vule in rdi with value in rax
 decq %rsi                          # decrease rsi
 
-cmpq $1 , %rsi                  # compare rsi to 1
-jg loop3                       # if rsi grwater or equal to 1 jump to loop3
-jmp end
+jmp loop3                       # if rsi grwater or equal to 1 jump to loop3
+
 
 case1:
 movq $1 ,%rax                  # 1 moved in rax
