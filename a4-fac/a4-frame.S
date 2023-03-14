@@ -78,10 +78,14 @@ ifCode:
         ret
 elseCode:
 
-        pushq %rdi;     # pushes rdi on the stack
+
+        subq $16 , %rsp # allocate 16 bytes on stack
+        movq %rdi, -8(%rbp)
+        
         decq %rdi;      # decreases rdi by 1, so the next fuction call is with n-1
         call factorial  
-        popq %rdi       # after base case reached, start going backwards
+        movq -8(%rbp), %rdi
+        addq $16, %rsp       # after base case reached, start going backwards
         mulq %rdi       # multiply curr rdi with the next value going up
 
         movq %rbp, %rsp; 
