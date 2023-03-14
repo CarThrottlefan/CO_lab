@@ -63,19 +63,20 @@ my_pow:
  movq %rdi, %rax                # move value in rdi to rax
 
  cmpq $0, %rsi                 # compare value in rsi(power) with 0
- jle case1                     # if its less or equal it jumps to case 1
-
-case1:
- movq $1 ,%rax                  # 1 moved in rax
- jle end                        # jump to end
+ je case1                     # if its equal it jumps to case 1
+ jmp loop3
 
 loop3:
 mulq %rdi                          # multiply vule in rdi with value in rax
 decq %rsi                          # decrease rsi
 
 cmpq $1 , %rsi                  # compare rsi to 1
-jge loop3                       # if rsi grwater or equakl to 1 jump to loop3
+jg loop3                       # if rsi grwater or equal to 1 jump to loop3
 jmp end
+
+case1:
+movq $1 ,%rax                  # 1 moved in rax
+je end                        # jump to end
 
 end:
 movq %rbp, %rsp           # end
