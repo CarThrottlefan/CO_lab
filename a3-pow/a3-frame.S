@@ -19,8 +19,6 @@
 .text
 # your strings here
 parameter1 : .asciz "%ld"
-parameter2 : .asciz "%ld"
-parameter3 : .asciz "%ld"
 
 .global my_main
 .global my_pow
