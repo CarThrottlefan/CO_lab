@@ -50,7 +50,8 @@ my_main:
         popq %rbp                       # at the end
 
 	movq $0, %rax
-        ret
+        ret                             # so call exit nukes it, but it works with ret?
+        
 factorial:
         pushq %rbp;
         movq %rsp, %rbp;
@@ -60,10 +61,10 @@ factorial:
         jmp else
 
 if:
-        movq %rbp, %rsp;
-        popq %rbp;
+        movq %rbp, %rsp; 
+        popq %rbp;              
 
-	movq $1, %rax;
+	movq $1, %rax;          # gives the value of 1 to rax
         ret
 else:
         cmpq $1, %rdi           # compare RAX to 1
@@ -71,19 +72,18 @@ else:
         jmp elseCode                # if you don't enter ifCode, jump to elseCode
 
 ifCode:
-        movq $1, %rax;
+        movq $1, %rax;          # set the value of rax to 1 - basecase of recursion
         movq %rbp, %rsp;
         popq %rbp;
         ret
 elseCode:
 
-        pushq %rdi;
-        decq %rdi;
-        call factorial
-        popq %rdi
-        mulq %rdi
-        # movq %rdi, %rax;
+        pushq %rdi;     # pushes rdi on the stack
+        decq %rdi;      # decreases rdi by 1, so the next fuction call is with n-1
+        call factorial  
+        popq %rdi       # after base case reached, start going backwards
+        mulq %rdi       # multiply curr rdi with the next value going up
 
-        movq %rbp, %rsp;
+        movq %rbp, %rsp; 
         popq %rbp;
         ret
