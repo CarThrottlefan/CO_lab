@@ -89,6 +89,6 @@ endPart:
         addq temp, hashVar_f;
         addq temp, hashVar_e;
         addq temp, hashVar_k;
-        addq temp, 
+        addq temp, # FIXME see how to get the value of the w[i] to here.
         # create temp vars, or see how to implement the gates - copy into registers???
 
