@@ -80,11 +80,11 @@ elseCode:
 
 
         subq $16 , %rsp # allocate 16 bytes on stack
-        movq %rdi, -8(%rbp)
+        movq %rdi, -8(%rbp) # get stuff in the stack
         
         decq %rdi;      # decreases rdi by 1, so the next fuction call is with n-1
         call factorial  
-        movq -8(%rbp), %rdi
+        movq -8(%rbp), %rdi # get stuff out of the stack
         addq $16, %rsp       # after base case reached, start going backwards
         mulq %rdi       # multiply curr rdi with the next value going up
 
