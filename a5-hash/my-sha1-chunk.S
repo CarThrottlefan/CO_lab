@@ -3,17 +3,6 @@
 
 .global sha1_chunk
 
-.data
-
-hashVar_a: .long 1
-hashVar_b: .long 1
-hashVar_c: .long 1
-hashVar_d: .long 1
-hashVar_e: .long 1
-
-hashVar_k: .long 1
-
-
 .text
 
  # rdi: [h0, h1, h2, h3, h4], rsi: uint32 v[80]
@@ -27,7 +16,7 @@ sha1_chunk:
         pushq %r13;
         pushq %r14;
         pushq %r15;
-        subq $16, %rsp # allocate 16 bytes on stack
+        subq $8, %rsp # allocate 16 bytes on stack
 
         movq %rsi, %rbx # set rbx as base pointer
         movq %rdi, %r15 # set r15 as the vector h
@@ -46,110 +35,109 @@ loop_0:
         addq $4, %rsi # increment pointer
 
         cmpq %rdi, %rsi # test to see if the first loop is over
-        jl loop_1
+        jl loop_0
 
-        movl (%r15), %ebx
-        movl %ebx, hashVar_a
-        movl 4(%r15), %ebx
-        movl %ebx, hashVar_b
-        movl 8(%r15), %ebx
-        movl %ebx, hashVar_c
-        movl 12(%r15), %ebx
-        movl %ebx, hashVar_d
-        movl 16(%r15), %ebx
-        movl %ebx, hashVar_e
+        movl (%r15), %r8d        # a = h0
+        movl 4(%r15), %r9d       # b = h1
+        movl 8(%r15), %r10d      # c = h2
+        movl 12(%r15), %r11d     # d = h3
+        movl 16(%r15), %r12d     # e = h4
         
-        movq $0, %r9 # intialize the "i" variable to 0
+        movq $0, %r13 # intialize the "i" variable to 0
 loop_1:   
-        cmpq $80, %r9 # do the loop test
+        cmpq $80, %r13 # do the loop test
         jge end
-        cmpq $19, %r9
+        cmpq $19, %r13
         jle if_2
-        cmpq $39, %r9
+        cmpq $39, %r13
         jle if_3
-        cmpq $59, %r9
+        cmpq $59, %r13
         jle if_4
-        cmpq $79, %r9
-        jle if_3
+        cmpq $79, %r13
+        jle if_5
 if_2:
-        incq %r9
+        incq %r13
         
-        movl hashVar_b(%rip), %eax
-        andl hashVar_c(%rip), %eax
+        movl %r9d, %eax
+        andl %r10d, %eax
 
-        movl hashVar_b(%rip), %ecx
+        movl %r9d, %ecx
         notl %ecx
-        andl hashVar_d(%rip), %ecx
+        andl %r11d, %ecx
 
         xorl %ecx, %eax 
 
-        movl $0x5A827999, hashVar_k # k = 0x5A827999 
+        movl $0x5A827999, %r14d # k = 0x5A827999 
 
         jmp endPart
 if_3: 
-        incq %r9
+        incq %r13
 
-        movl hashVar_b(%rip), %eax
-        xorl hashVar_c(%rip), %eax
-        xorl hashVar_d(%rip), %eax
+        movl %r9d, %eax
+        xorl %r10d, %eax
+        xorl %r11d, %eax
 
-        movl $0x6ED9EBA1, hashVar_k  # k = 0x6ED9EBA1
+        movl $0x6ED9EBA1, %r14d  # k = 0x6ED9EBA1
 
         jmp endPart
 if_4: 
-        incq %r9
+        incq %r13
 
-        movl hashVar_b(%rip), %eax
-        andl hashVar_c(%rip), %eax
+        movl %r9d, %eax
+        andl %r10d, %eax
 
-        movl hashVar_b(%rip), %ecx
-        andl hashVar_d(%rip), %ecx
+        movl %r9d, %ecx
+        andl %r11d, %ecx
 
         xorl %ecx, %eax
 
-        movl hashVar_c(%rip), %ecx
-        andl hashVar_d(%rip), %ecx
+        movl %r10d, %ecx
+        andl %r11d, %ecx
         
         xorl %ecx, %eax
 
-        movl $0x8F1BBCDC, hashVar_k  # k = 0x8F1BBCDC
+        movl $0x8F1BBCDC, %r14d  # k = 0x8F1BBCDC
+
+        jmp endPart
+
+if_5: 
+        incq %r13
+
+        movl %r9d, %eax
+        xorl %r10d, %eax
+        xorl %r11d, %eax
+
+        movl $0xCA62C1D6, %r14d  # k = 0xCA62C1D6
 
         jmp endPart
 endPart: 
 # stack now is a,b,c,d,e from top to bottom
 
         # temp = (a leftrotate 5) + f + e + k + w[i])
-        movl hashVar_a(%rip), %ecx # temp is ecx
+        movl %r8d, %ecx # temp is ecx
         roll $5, %ecx
         addl %eax, %ecx
-        addl hashVar_e(%rip), %ecx
-        addl hashVar_k(%rip), %ecx
-        addl (%rbx, %r9, 4), %ecx
+        addl %r12d, %ecx
+        addl %r14d, %ecx # k
+        addl -4(%rbx, %r13, 4), %ecx
 
-        movl hashVar_d(%rip), %ebx
-        movl %ebx, hashVar_e
-        movl hashVar_c(%rip), %ebx
-        movl %ebx, hashVar_d
-        movl hashVar_b(%rip), %ebx
-        movl %ebx, hashVar_c
-        roll $30, hashVar_c # FIXME add rip?
-        movl hashVar_a(%rip), %ebx
-        movl %ebx, hashVar_b
-        movl %ecx, hashVar_a
+        movl %r11d, %r12d        # e = d
+        movl %r10d, %r11d        # d = c
+        movl %r9d, %r10d         # c = b...
+        roll $30, %r10d          # ...leftrotate 30
+        movl %r8d, %r9d          # b = a
+        movl %ecx, %r8d          # a = temp
+
+        jmp loop_1
 
 end:    
-        movl hashVar_a(%rip), %ebx
-        addl %ebx, (%r15)
-        movl hashVar_b(%rip), %ebx
-        addl %ebx, 4(%r15)
-        movl hashVar_c(%rip), %ebx
-        addl %ebx, 8(%r15)
-        movl hashVar_d(%rip), %ebx
-        addl %ebx, 12(%r15)
-        movl hashVar_e(%rip), %ebx
-        addl %ebx, 16(%r15)
+        addl %r8d, (%r15)
+        addl %r9d, 4(%r15)
+        addl %r10d, 8(%r15)
+        addl %r11d, 12(%r15)
+        addl %r12d, 16(%r15)
 
-        addq $16, %rsp
+        addq $8, %rsp
         popq %r15
         popq %r14
         popq %r13
