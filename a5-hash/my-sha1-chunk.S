@@ -13,7 +13,6 @@ hashVar_e: .long 1
 
 hashVar_k: .long 1
 
-i: .long 1
 
 .text
 
@@ -40,8 +39,10 @@ loop_0:
         xorl -32(%rsi), %ecx
         xorl -56(%rsi), %ecx
         xorl -64(%rsi), %ecx
-
         roll $1, %ecx
+
+        movl %ecx, (%rsi)
+
         addq $4, %rsi # increment pointer
 
         cmpq %rdi, %rsi # test to see if the first loop is over
@@ -58,20 +59,20 @@ loop_0:
         movl 16(%r15), %ebx
         movl %ebx, hashVar_e
         
-        movq $0, i # intialize the "i" variable to 0
+        movq $0, %r9 # intialize the "i" variable to 0
 loop_1:   
-        cmpq $80, i # do the loop test
+        cmpq $80, %r9 # do the loop test
         jge end
-        cmpq $19, i
+        cmpq $19, %r9
         jle if_2
-        cmpq $39, i
+        cmpq $39, %r9
         jle if_3
-        cmpq $59, i
+        cmpq $59, %r9
         jle if_4
-        cmpq $79, i
+        cmpq $79, %r9
         jle if_3
 if_2:
-        incq i(%rip)
+        incq %r9
         
         movl hashVar_b(%rip), %eax
         andl hashVar_c(%rip), %eax
@@ -86,7 +87,7 @@ if_2:
 
         jmp endPart
 if_3: 
-        incq i(%rip)
+        incq %r9
 
         movl hashVar_b(%rip), %eax
         xorl hashVar_c(%rip), %eax
@@ -96,7 +97,7 @@ if_3:
 
         jmp endPart
 if_4: 
-        incq i(%rip)
+        incq %r9
 
         movl hashVar_b(%rip), %eax
         andl hashVar_c(%rip), %eax
@@ -123,8 +124,7 @@ endPart:
         addl %eax, %ecx
         addl hashVar_e(%rip), %ecx
         addl hashVar_k(%rip), %ecx
-        movq i(%rip), %rcx
-        addl (%rbx, %rcx, 4), %ecx
+        addl (%rbx, %r9, 4), %ecx
 
         movl hashVar_d(%rip), %ebx
         movl %ebx, hashVar_e
