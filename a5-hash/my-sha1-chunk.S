@@ -15,6 +15,8 @@ hashVar_k: .long 1
 
 i: .long 1
 
+.text
+
  # rdi: [h0, h1, h2, h3, h4], rsi: uint32 v[80]
 sha1_chunk:
         # IMPLEMENT ME
@@ -34,22 +36,27 @@ sha1_chunk:
         leaq 64(%rbx), %rsi 
         leaq 320(%rbx), %rdi
 loop_0:
-        movl -12(%rsi), %rcx
-        xorl -32(%rsi), %rcx
-        xorl -56(%rsi), %rcx
-        xorl -64(%rsi), %rcx
+        movl -12(%rsi), %ecx
+        xorl -32(%rsi), %ecx
+        xorl -56(%rsi), %ecx
+        xorl -64(%rsi), %ecx
 
-        roll $1, %rcx
+        roll $1, %ecx
         addq $4, %rsi # increment pointer
 
         cmpq %rdi, %rsi # test to see if the first loop is over
-        jl loop1
+        jl loop_1
 
-        movl (%r15), hashVar_a
-        movl 4(%r15), hashVar_b
-        movl 8(%r15), hashVar_c
-        movl 12(%r15), hashVar_d
-        movl 16(%r15), hashVar_e
+        movl (%r15), %ebx
+        movl %ebx, hashVar_a
+        movl 4(%r15), %ebx
+        movl %ebx, hashVar_b
+        movl 8(%r15), %ebx
+        movl %ebx, hashVar_c
+        movl 12(%r15), %ebx
+        movl %ebx, hashVar_d
+        movl 16(%r15), %ebx
+        movl %ebx, hashVar_e
         
         movq $0, i # intialize the "i" variable to 0
 loop_1:   
@@ -69,11 +76,11 @@ if_2:
         movl hashVar_b(%rip), %eax
         andl hashVar_c(%rip), %eax
 
-        movl hashVar_b(%rip), %rcx
-        notl %rcx
-        andl %hashVar_d(%rip), %rcx
+        movl hashVar_b(%rip), %ecx
+        notl %ecx
+        andl hashVar_d(%rip), %ecx
 
-        xorl %rcx, %eax 
+        xorl %ecx, %eax 
 
         movl $0x5A827999, hashVar_k # k = 0x5A827999 
 
@@ -94,15 +101,15 @@ if_4:
         movl hashVar_b(%rip), %eax
         andl hashVar_c(%rip), %eax
 
-        movl hashVar_b(%rip), %rcx
-        andl hashVar_d(%rip), %rcx
+        movl hashVar_b(%rip), %ecx
+        andl hashVar_d(%rip), %ecx
 
-        xorl %rcx, %eax
+        xorl %ecx, %eax
 
-        movl hashVar_c(%rip), %rcx
-        andl hashVar_d(%rip), %rcx
+        movl hashVar_c(%rip), %ecx
+        andl hashVar_d(%rip), %ecx
         
-        xorl %rcx, %eax
+        xorl %ecx, %eax
 
         movl $0x8F1BBCDC, hashVar_k  # k = 0x8F1BBCDC
 
@@ -111,29 +118,38 @@ endPart:
 # stack now is a,b,c,d,e from top to bottom
 
         # temp = (a leftrotate 5) + f + e + k + w[i])
-        movl hashVar_a(%rip), %rcx # temp is rcx
-        roll $5, %rcx
-        addl %eax, %rcx
-        addl hashVar_e(%rip), %rcx
-        addl hashVar_k(%rip), %rcx
-        movl i(%rip), %eax
-        addl (%rbx, %eax, 4), %rcx
+        movl hashVar_a(%rip), %ecx # temp is ecx
+        roll $5, %ecx
+        addl %eax, %ecx
+        addl hashVar_e(%rip), %ecx
+        addl hashVar_k(%rip), %ecx
+        movq i(%rip), %rcx
+        addl (%rbx, %rcx, 4), %ecx
 
-        movl hashVar_d(%rip), hashVar_e
-        movl hashVar_c(%rip), hashVar_d
-        movl hashVar_b(%rip), hashVar_c
+        movl hashVar_d(%rip), %ebx
+        movl %ebx, hashVar_e
+        movl hashVar_c(%rip), %ebx
+        movl %ebx, hashVar_d
+        movl hashVar_b(%rip), %ebx
+        movl %ebx, hashVar_c
         roll $30, hashVar_c # FIXME add rip?
-        movl hashVar_a(%rip), hashVar_b
-        movl %rcx, hashVar_a
+        movl hashVar_a(%rip), %ebx
+        movl %ebx, hashVar_b
+        movl %ecx, hashVar_a
 
 end:    
-        addl hashVar_a(%rip), (%r15)
-        addl hashVar_b(%rip), 4(%r15)
-        addl hashVar_c(%rip), 8(%r15)
-        addl hashVar_d(%rip), 12(%r15)
-        addl hashVar_e(%rip), 16(%r15)
+        movl hashVar_a(%rip), %ebx
+        addl %ebx, (%r15)
+        movl hashVar_b(%rip), %ebx
+        addl %ebx, 4(%r15)
+        movl hashVar_c(%rip), %ebx
+        addl %ebx, 8(%r15)
+        movl hashVar_d(%rip), %ebx
+        addl %ebx, 12(%r15)
+        movl hashVar_e(%rip), %ebx
+        addl %ebx, 16(%r15)
 
-        addq $8, %rsp
+        addq $16, %rsp
         popq %r15
         popq %r14
         popq %r13
@@ -144,4 +160,3 @@ end:
         popq %rbp
 
         ret
-
